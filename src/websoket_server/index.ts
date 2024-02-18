@@ -1,6 +1,10 @@
 import {AddressInfo, WebSocketServer} from 'ws';
 import colorize from "../utils/colorize";
 import {parseRequestMessageString} from "../utils/messageParser";
+import {commandTypes} from "../types/entities/commandTypes";
+import {IMessage} from "../types/entities/message";
+import {IRegRequestData} from "../types/commands/registration";
+import {messageService} from "../service/service";
 
 export const websocketServerStart = (wsPort: number) => {
     const server = new WebSocketServer({port: wsPort});
@@ -28,8 +32,30 @@ export const websocketServerStart = (wsPort: number) => {
 
         wsClient.on('message', (data: Buffer) => {
             try {
-                const messageData = parseRequestMessageString(data.toString());
-                console.log(messageData.type);
+                const messageData: IMessage = parseRequestMessageString(data.toString());
+                switch (messageData.type) {
+                    case commandTypes.REGISTRATION:
+                        const registrationData = JSON.parse(messageData.data) as IRegRequestData;
+                        messageService.registrationOrLogin(
+                            registrationData,
+                            messageData.type,
+                            messageData.id,
+                            wsClient
+                        );
+                        break;
+                    case commandTypes.CREATE_ROOM:
+                        break;
+                    case commandTypes.ADD_PLAYER_TO_ROOM:
+                        break;
+                    case commandTypes.SINGLE_PLAY:
+                        break;
+                    case commandTypes.ADD_SHIPS:
+                        break;
+                    case commandTypes.ATTACK:
+                        break;
+                    case commandTypes.RANDOM_ATTACK:
+                        break;
+                }
             } catch (error) {
                 if (error instanceof Error) {
                     console.error(error);
