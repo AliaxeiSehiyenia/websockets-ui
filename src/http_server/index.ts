@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as http from 'http';
+import colorize from "../utils/colorize";
 
 export const httpServer = http.createServer(function (req, res) {
     const __dirname = path.resolve(path.dirname(''));
@@ -17,6 +18,8 @@ export const httpServer = http.createServer(function (req, res) {
 });
 
 export const httpServerStart = (HTTP_PORT: number) => {
-    console.log(`Start static http server on the ${HTTP_PORT} port!`);
+    console.log((colorize('Start static http server on the ', 'brightGreen') +
+        colorize(HTTP_PORT, 'cyan') +
+        colorize(' port!', 'brightGreen')));
     httpServer.listen(HTTP_PORT);
 };
