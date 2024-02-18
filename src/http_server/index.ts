@@ -18,8 +18,8 @@ export const httpServer = http.createServer(function (req, res) {
 });
 
 export const httpServerStart = (HTTP_PORT: number) => {
+    httpServer.listen(HTTP_PORT);
     console.log((colorize('Start static http server on the ', 'brightGreen') +
         colorize(HTTP_PORT, 'cyan') +
         colorize(' port!', 'brightGreen')));
-    httpServer.listen(HTTP_PORT);
 };
