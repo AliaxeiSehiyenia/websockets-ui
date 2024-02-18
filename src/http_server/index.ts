@@ -15,3 +15,8 @@ export const httpServer = http.createServer(function (req, res) {
         res.end(data);
     });
 });
+
+export const httpServerStart = (HTTP_PORT: number) => {
+    console.log(`Start static http server on the ${HTTP_PORT} port!`);
+    httpServer.listen(HTTP_PORT);
+};
