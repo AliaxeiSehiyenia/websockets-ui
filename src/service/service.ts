@@ -14,6 +14,10 @@ class MessageService {
     registrationOrLogin(data: IRegRequestData, type: commandTypes, id: number, ws: WebSocket) {
         return this.repository.registrationOrLogin(data, type, id, ws)
     }
+
+    createRoom(type: commandTypes, id: number, ws: WebSocket) {
+        return this.repository.createRoom(type, id, ws)
+    }
 }
 
 export const messageService = new MessageService();

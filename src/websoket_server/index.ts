@@ -2,7 +2,7 @@ import {AddressInfo, WebSocketServer} from 'ws';
 import colorize from "../utils/colorize";
 import {parseRequestMessageString} from "../utils/messageParser";
 import {commandTypes} from "../types/entities/commandTypes";
-import {IMessage} from "../types/entities/message";
+import {IMessage} from "../types/entities/messages";
 import {IRegRequestData} from "../types/commands/registration";
 import {messageService} from "../service/service";
 
@@ -44,6 +44,18 @@ export const websocketServerStart = (wsPort: number) => {
                         );
                         break;
                     case commandTypes.CREATE_ROOM:
+                        const responseCreateGameData = messageService.createRoom(
+                            messageData.type,
+                            messageData.id,
+                            wsClient
+                        );
+                        responseCreateGameData.data = JSON.stringify(responseCreateGameData.data);
+                        wsClient.send(JSON.stringify(responseCreateGameData));
+                        server.clients.forEach((client) => {
+                            if (client !== wsClient && client.readyState === WebSocket.OPEN) {
+                                client.send(JSON.stringify(responseCreateGameData));
+                            }
+                        });
                         break;
                     case commandTypes.ADD_PLAYER_TO_ROOM:
                         break;
