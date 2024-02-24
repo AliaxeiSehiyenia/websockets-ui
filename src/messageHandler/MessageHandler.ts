@@ -14,6 +14,8 @@ class MessageHandler {
     winners: Array<IWinner> = [];
     roomCounter = 0;
 
+    onlineUsers = this.users.filter(item => item.isOnline)
+
     registrationOrLogin(data: IRegistrationRequestData, type: commandTypes, id: number, ws: WebSocket) {
         const existedUser = this.users.find((user) => user.name === data.name);
         if (existedUser) {
@@ -43,8 +45,9 @@ class MessageHandler {
                 }));
                 this.users = [...this.users, {...existedUser, isOnline: true}];
                 console.log(colorize(existedUser.name, 'cyan') + colorize(' has logged in', 'brightGreen'));
-                const onlineUsers = this.users.filter(item => item.isOnline)
-                console.log(colorize('users online: ', 'magenta') + colorize(onlineUsers.length, 'cyan'));
+
+                console.log(colorize('users online: ', 'magenta') + colorize(this.onlineUsers.length, 'cyan'));
+                ws.send(createResponseMessage(commandTypes.UPDATE_ROOM, id, this.rooms));
                 ws.send(createResponseMessage(commandTypes.UPDATE_WINNERS, id, this.winners));
             } else {
                 ws.send(createResponseMessage(type, id, {
@@ -66,8 +69,8 @@ class MessageHandler {
             errorText: '',
         }));
         console.log(colorize(newUser.name, 'cyan') + colorize(' has logged in', 'brightGreen'));
-        const onlineUsers = this.users.filter(item => item.isOnline)
-        console.log(colorize('users online: ', 'magenta') + colorize(onlineUsers.length, 'cyan'));
+        console.log(colorize('users online: ', 'magenta') + colorize(this.onlineUsers.length, 'cyan'));
+        ws.send(createResponseMessage(commandTypes.UPDATE_ROOM, id, this.rooms));
         ws.send(createResponseMessage(commandTypes.UPDATE_WINNERS, id, this.winners));
     }
 
