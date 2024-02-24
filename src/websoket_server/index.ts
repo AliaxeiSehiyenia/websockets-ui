@@ -3,8 +3,8 @@ import colorize from "../utils/colorize";
 import {parseRequestMessageString} from "../utils/messageParser";
 import {commandTypes} from "../types/entities/commandTypes";
 import {IMessage} from "../types/entities/messages";
-import {IRegRequestData} from "../types/commands/registration";
-import {messageService} from "../service/service";
+import {IRegistrationRequestData} from "../types/commands/registration";
+import {messageHandler} from "../messageHandler/MessageHandler";
 
 export const websocketServerStart = (wsPort: number) => {
     const server = new WebSocketServer({port: wsPort});
@@ -35,8 +35,8 @@ export const websocketServerStart = (wsPort: number) => {
                 const messageData: IMessage = parseRequestMessageString(data.toString());
                 switch (messageData.type) {
                     case commandTypes.REGISTRATION:
-                        const registrationData = JSON.parse(messageData.data) as IRegRequestData;
-                        messageService.registrationOrLogin(
+                        const registrationData = JSON.parse(messageData.data) as IRegistrationRequestData;
+                        messageHandler.registrationOrLogin(
                             registrationData,
                             messageData.type,
                             messageData.id,
@@ -44,7 +44,7 @@ export const websocketServerStart = (wsPort: number) => {
                         );
                         break;
                     case commandTypes.CREATE_ROOM:
-                        const responseCreateGameData = messageService.createRoom(
+                        const responseCreateGameData = messageHandler.createRoom(
                             messageData.type,
                             messageData.id,
                             wsClient

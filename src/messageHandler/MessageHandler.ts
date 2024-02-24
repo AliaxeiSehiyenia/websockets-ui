@@ -1,5 +1,5 @@
 import {IUser, User} from "../types/entities/user";
-import {IRegRequestData} from "../types/commands/registration";
+import {IRegistrationRequestData} from "../types/commands/registration";
 import {commandTypes} from "../types/entities/commandTypes";
 import {createResponseMessage} from "../utils/messageParser";
 import colorize from "../utils/colorize";
@@ -7,12 +7,12 @@ import * as uuid from 'uuid';
 import {ICreateRoomResponse} from "../types/entities/messages";
 import {IRoom, Room} from "../types/entities/room";
 
-export class Repository {
+class MessageHandler {
     users: Array<IUser> = [];
     rooms: Array<IRoom> = [];
     roomCounter = 0;
 
-    registrationOrLogin(data: IRegRequestData, type: commandTypes, id: number, ws: WebSocket) {
+    registrationOrLogin(data: IRegistrationRequestData, type: commandTypes, id: number, ws: WebSocket) {
         const existedUser = this.users.find((user) => user.name === data.name);
         if (existedUser) {
             if (existedUser.password === data.password) {
@@ -59,3 +59,5 @@ export class Repository {
         };
     }
 }
+
+export const messageHandler = new MessageHandler();
