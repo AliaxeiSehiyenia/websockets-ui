@@ -6,16 +6,35 @@ import colorize from "../utils/colorize";
 import * as uuid from 'uuid';
 import {ICreateRoomResponse} from "../types/entities/messages";
 import {IRoom, Room} from "../types/entities/room";
+import {IWinner} from "../types/entities/winner";
 
 class MessageHandler {
     users: Array<IUser> = [];
     rooms: Array<IRoom> = [];
+    winners: Array<IWinner> = [];
     roomCounter = 0;
 
     registrationOrLogin(data: IRegistrationRequestData, type: commandTypes, id: number, ws: WebSocket) {
         const existedUser = this.users.find((user) => user.name === data.name);
         if (existedUser) {
             if (existedUser.password === data.password) {
+                if (this.users.filter(item => item.name === existedUser.name)) {
+                    ws.send(createResponseMessage(type, id, {
+                        name: '',
+                        id: 0,
+                        error: true,
+                        errorText: 'You have already logged in via other device'
+                    }));
+                    return;
+                }
+                this.users = this.users.map((user) => {
+                    if (user.name === existedUser.name) {
+                        user.ws = ws;
+                        return user;
+                    } else {
+                        return user;
+                    }
+                });
                 ws.send(createResponseMessage(type, id, {
                     name: existedUser.name,
                     id: existedUser.id,
@@ -24,6 +43,9 @@ class MessageHandler {
                 }));
                 this.users = [...this.users, {...existedUser, isOnline: true}];
                 console.log(colorize(existedUser.name, 'cyan') + colorize(' has logged in', 'brightGreen'));
+                const onlineUsers = this.users.filter(item => item.isOnline)
+                console.log(colorize('users online: ', 'magenta') + colorize(onlineUsers.length, 'cyan'));
+                ws.send(createResponseMessage(commandTypes.UPDATE_WINNERS, id, this.winners));
             } else {
                 ws.send(createResponseMessage(type, id, {
                     name: '',
@@ -44,6 +66,9 @@ class MessageHandler {
             errorText: '',
         }));
         console.log(colorize(newUser.name, 'cyan') + colorize(' has logged in', 'brightGreen'));
+        const onlineUsers = this.users.filter(item => item.isOnline)
+        console.log(colorize('users online: ', 'magenta') + colorize(onlineUsers.length, 'cyan'));
+        ws.send(createResponseMessage(commandTypes.UPDATE_WINNERS, id, this.winners));
     }
 
     createRoom(type: commandTypes, id: number, ws: WebSocket): ICreateRoomResponse {
