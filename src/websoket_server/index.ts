@@ -3,7 +3,7 @@ import colorize from "../utils/colorize";
 import {parseRequestMessageString} from "../utils/messageParser";
 import {commandTypes} from "../types/entities/commandTypes";
 import {IMessage} from "../types/entities/messages";
-import {IRegistrationRequestData} from "../types/commands/registration";
+import {IAddUserToRoomRequestData, IRegistrationRequestData} from "../types/commands/registration";
 import {messageHandler} from "../messageHandler/MessageHandler";
 
 export const websocketServerStart = (wsPort: number) => {
@@ -58,6 +58,16 @@ export const websocketServerStart = (wsPort: number) => {
                         });
                         break;
                     case commandTypes.ADD_PLAYER_TO_ROOM:
+                        const addUserToRoomData = JSON.parse(
+                            messageData.data as string
+                        ) as IAddUserToRoomRequestData;
+                        messageHandler.addUserToRoom(
+                            addUserToRoomData,
+                            messageData.type,
+                            messageData.id,
+                            wsClient,
+                            server
+                        );
                         break;
                     case commandTypes.SINGLE_PLAY:
                         break;

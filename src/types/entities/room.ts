@@ -1,14 +1,14 @@
 import {IUser} from "./user";
 
 export interface IRoom {
-    roomId: number;
+    roomId: string;
     roomUsers: Array<IUser>;
 }
 
 export class Room implements IRoom {
-    roomId: number;
+    roomId: string;
     roomUsers: Array<IUser>;
-    constructor(roomId: number, roomUsers: Array<IUser>) {
+    constructor(roomId: string, roomUsers: Array<IUser>) {
         this.roomId = roomId;
         this.roomUsers = roomUsers;
     }

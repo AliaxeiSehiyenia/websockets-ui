@@ -1,9 +1,8 @@
 import {IMessage} from "../types/entities/messages";
 import {commandTypes} from "../types/entities/commandTypes";
-import colorize from "./colorize";
 
-export function createResponseMessage(type: commandTypes, id: number, data: unknown): string {
-    const ResponseMessage = JSON.stringify({type: type, data: JSON.stringify(data), id: id})
+export function createResponseMessage(type: commandTypes, data: unknown): string {
+    const ResponseMessage = JSON.stringify({type: type, data: JSON.stringify(data)})
     console.log("ResponseMessage", ResponseMessage)
     return ResponseMessage
 }
