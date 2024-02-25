@@ -3,8 +3,13 @@ import colorize from "../utils/colorize";
 import {parseRequestMessageString} from "../utils/messageParser";
 import {commandTypes} from "../types/entities/commandTypes";
 import {IMessage} from "../types/entities/messages";
-import {IAddUserToRoomRequestData, IRegistrationRequestData} from "../types/commands/registration";
 import {messageHandler} from "../messageHandler/MessageHandler";
+import {
+    IAddUserShipsRequestData,
+    IAddUserToRoomRequestData,
+    IAttackRequestData, IRandomAttackRequestData,
+    IRegistrationRequestData
+} from "../types/types/types";
 
 export const websocketServerStart = (wsPort: number) => {
     const server = new WebSocketServer({port: wsPort});
@@ -44,18 +49,12 @@ export const websocketServerStart = (wsPort: number) => {
                         );
                         break;
                     case commandTypes.CREATE_ROOM:
-                        const responseCreateGameData = messageHandler.createRoom(
+                        messageHandler.createRoom(
                             messageData.type,
                             messageData.id,
-                            wsClient
+                            wsClient,
+                            server
                         );
-                        responseCreateGameData.data = JSON.stringify(responseCreateGameData.data);
-                        wsClient.send(JSON.stringify(responseCreateGameData));
-                        server.clients.forEach((client) => {
-                            if (client !== wsClient && client.readyState === WebSocket.OPEN) {
-                                client.send(JSON.stringify(responseCreateGameData));
-                            }
-                        });
                         break;
                     case commandTypes.ADD_PLAYER_TO_ROOM:
                         const addUserToRoomData = JSON.parse(
@@ -72,10 +71,30 @@ export const websocketServerStart = (wsPort: number) => {
                     case commandTypes.SINGLE_PLAY:
                         break;
                     case commandTypes.ADD_SHIPS:
+                        const addUserShipsData = JSON.parse(
+                            messageData.data as string
+                        ) as IAddUserShipsRequestData;
+                        messageHandler.addUserShips(
+                            addUserShipsData,
+                            messageData.type,
+                            messageData.id,
+                            server
+                        );
                         break;
                     case commandTypes.ATTACK:
+                        const attackData = JSON.parse(messageData.data as string) as IAttackRequestData;
+                        messageHandler.attack(attackData, messageData.type, messageData.id, server);
                         break;
                     case commandTypes.RANDOM_ATTACK:
+                        const randomAttackData = JSON.parse(
+                            messageData.data as string
+                        ) as IRandomAttackRequestData;
+                        messageHandler.randomAttack(
+                            randomAttackData,
+                            messageData.type,
+                            messageData.id,
+                            server
+                        );
                         break;
                 }
             } catch (error) {
